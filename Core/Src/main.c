@@ -95,47 +95,20 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start(&htim1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin))
+    if (__HAL_TIM_GET_COUNTER(&htim1) > __HAL_TIM_GET_AUTORELOAD(&htim1)/2)
     {
-      HAL_Delay(20);
-      while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin)) {}
-      HAL_Delay(1);
-      flag = !flag;
-    }
-    if (flag)
-    {
-      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
-      HAL_Delay(100);
-      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
-      HAL_Delay(100);
-      ticks = HAL_GetTick();
-      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_RESET);
-      HAL_Delay(100);
-      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
-      HAL_Delay(100);
+      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_RESET);
     } else
     {
       HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
-      HAL_Delay(100);
-      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
-      HAL_Delay(100);
-      ticks = HAL_GetTick();
-      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_RESET);
-      HAL_Delay(100);
-      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
-      HAL_Delay(100);
-
     }
-
-
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
