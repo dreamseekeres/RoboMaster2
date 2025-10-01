@@ -44,7 +44,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint32_t ticks;
+uint32_t flag = 0;
+uint32_t clock = 0;
+uint8_t key_lock = 1;
+uint32_t ticks_1=0,ticks_2=0;
+uint32_t key_pressed = 0;
+uint32_t last_key_time = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,6 +102,40 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin))
+    {
+      HAL_Delay(20);
+      while (HAL_GPIO_ReadPin(KEY_GPIO_Port, KEY_Pin)) {}
+      HAL_Delay(1);
+      flag = !flag;
+    }
+    if (flag)
+    {
+      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
+      HAL_Delay(100);
+      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
+      HAL_Delay(100);
+      ticks = HAL_GetTick();
+      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_RESET);
+      HAL_Delay(100);
+      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
+      HAL_Delay(100);
+    } else
+    {
+      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
+      HAL_Delay(100);
+      HAL_GPIO_WritePin(LEDR_GPIO_Port, LEDR_Pin, GPIO_PIN_SET);
+      HAL_Delay(100);
+      ticks = HAL_GetTick();
+      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_RESET);
+      HAL_Delay(100);
+      HAL_GPIO_WritePin(LEDG_GPIO_Port, LEDG_Pin, GPIO_PIN_SET);
+      HAL_Delay(100);
+
+    }
+
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
