@@ -53,6 +53,7 @@ uint32_t ticks_1=0,ticks_2=0;
 uint32_t key_pressed = 0;
 uint32_t last_key_time = 0;
 uint8_t rx_msg[4] ;
+uint8_t tx_msg[4] ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,7 +99,8 @@ int main(void)
   MX_TIM1_Init();
   MX_UART7_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart7, rx_msg,1);
+  HAL_UART_Receive_IT(&huart7, rx_msg,3);
+  //uint8_t tx_msg [] = "RoboMaster";
   //HAL_TIM_Base_Start_IT(&htim1);
   //HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   /* USER CODE END 2 */
@@ -107,7 +109,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_UART_Transmit(&huart7, rx_msg, 11, 1000);
+
+    HAL_UART_Transmit(&huart7, tx_msg, 4, 1000);
     HAL_Delay(1000);
     // uint32_t arr_value = __HAL_TIM_GetCounter(&htim1)+1;
     // uint32_t brightness = arr_value * sinf(4*HAL_GetTick()/1000.f) - 1 ;
