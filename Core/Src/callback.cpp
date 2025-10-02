@@ -11,3 +11,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, brightness);
     }
 }
+
+uint32_t count = 0;
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim == &htim1)
+    {
+        count++;
+    }
+}
