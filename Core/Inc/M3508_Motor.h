@@ -11,14 +11,16 @@ private:
     const float ratio_;
     float angle_ = 0.0f;
     float delta_angle_ = 0.0f;
-    float ecd_delta_ = 0.0f;
-    float delta_ecd_angle = 0.0f;
+    float ecd_angle_ = 0.0f;
+    float delta_ecd_angle_ = 0.0f;
     float rotate_speed_ = 0.0f;
-    float current = 0.0f;
-    float temp = 0.0f;
+    float current_ = 0.0f;
+    float temp_ = 0.0f;
 public:
+    float linearMapping(int in, int in_min, int in_max, float out_min, float out_max);
     explicit M3508_Motor(const float ratio):ratio_(ratio){ };
     void canRxMsgCallback(const uint8_t rx_data[8]);
+
 };
 
 

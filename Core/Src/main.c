@@ -137,8 +137,8 @@ int main(void)
   while (1)
   {
 
-    HAL_UART_Transmit(&huart7, tx_msg, 4, 1000);
-    HAL_Delay(1000);
+    // HAL_UART_Transmit(&huart7, tx_msg, 4, 1000);
+    // HAL_Delay(1000);
     // uint32_t arr_value = __HAL_TIM_GetCounter(&htim1)+1;
     // uint32_t brightness = arr_value * sinf(4*HAL_GetTick()/1000.f) - 1 ;
     // __HAL_TIM_SetCompare(&htim1, TIM_CHANNEL_2, brightness);
