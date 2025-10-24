@@ -1,5 +1,59 @@
 #include "M3508_Motor.h"
 
+#include <algorithm>
+
+
+
+M3508_Motor::M3508_Motor(const float ratio,
+                        float sp_kp, float sp_ki, float sp_kd, float sp_i_max, float sp_out_max,
+                        float pp_kp, float pp_ki, float pp_kd, float pp_i_max, float pp_out_max)
+    : ratio_(ratio),
+      spid_(sp_kp, sp_ki, sp_kd, sp_i_max, sp_out_max),
+      ppid_(pp_kp, pp_ki, pp_kd, pp_i_max, pp_out_max),
+      control_method_(TORQUE)
+{
+    // 初始化变量
+    target_angle_ = 0.0f;
+    fdb_angle_ = 0.0f;
+    target_speed_ = 0.0f;
+    fdb_speed_ = 0.0f;
+    feedforward_speed_ = 0.0f;
+    feedforward_intensity_ = 0.0f;
+    output_intensity_ = 0.0f;
+}
+
+
+
+void M3508_Motor::handle() {
+    switch (control_method_) {
+    case TORQUE:
+        // 直接力矩控制，output_intensity_已在SetIntensity中设置
+        break;
+
+    case SPEED:
+        // 速度环控制
+        output_intensity_ = spid_.calc(target_speed_, fdb_speed_) + feedforward_intensity_;
+        break;
+
+    case POSITION_SPEED:
+        // 位置-速度串级控制
+        // 位置环输出作为速度环的目标
+        float speed_target = ppid_.calc(target_angle_, fdb_angle_) + feedforward_speed_;
+        // 速度环计算输出电流
+        output_intensity_ = spid_.calc(speed_target, fdb_speed_) + feedforward_intensity_;
+        break;
+    }
+
+    // 限幅保护
+    output_intensity_ = std::max(std::min(output_intensity_, 20.0f), -20.0f);
+}
+
+
+
+
+
+
+
 
 float M3508_Motor::linearMapping(int in, int in_min, int in_max, float out_min, float out_max)
 {
@@ -35,4 +89,23 @@ void M3508_Motor::canRxMsgCallback(const uint8_t rx_data[8]){
     angle_ += delta_angle_;
 }
 
+
+
+void M3508_Motor::SetPosition(float target_position, float feedforward_speed, float feedforward_intensity) {
+    control_method_ = POSITION_SPEED;
+    target_angle_ = target_position;
+    feedforward_speed_ = feedforward_speed;
+    feedforward_intensity_ = feedforward_intensity;
+}
+
+void M3508_Motor::SetSpeed(float target_speed, float feedforward_intensity) {
+    control_method_ = SPEED;
+    target_speed_ = target_speed;
+    feedforward_intensity_ = feedforward_intensity;
+}
+
+void M3508_Motor::SetIntensity(float intensity) {
+    control_method_ = TORQUE;
+    output_intensity_ = intensity;
+}
 
