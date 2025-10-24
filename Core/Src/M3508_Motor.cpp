@@ -1,12 +1,12 @@
 #include "M3508_Motor.h"
 
-#include <algorithm>
 
+#include <cmath>
 
 
 M3508_Motor::M3508_Motor(const float ratio,
-                        float sp_kp, float sp_ki, float sp_kd, float sp_i_max, float sp_out_max,
-                        float pp_kp, float pp_ki, float pp_kd, float pp_i_max, float pp_out_max)
+                         float sp_kp, float sp_ki, float sp_kd, float sp_i_max, float sp_out_max,
+                         float pp_kp, float pp_ki, float pp_kd, float pp_i_max, float pp_out_max)
     : ratio_(ratio),
       spid_(sp_kp, sp_ki, sp_kd, sp_i_max, sp_out_max),
       ppid_(pp_kp, pp_ki, pp_kd, pp_i_max, pp_out_max),
@@ -45,7 +45,7 @@ void M3508_Motor::handle() {
     }
 
     // 限幅保护
-    output_intensity_ = std::max(std::min(output_intensity_, 20.0f), -20.0f);
+    output_intensity_ = std::fmax(std::fmin(output_intensity_, 20.0f), -20.0f);
 }
 
 
@@ -109,3 +109,21 @@ void M3508_Motor::SetIntensity(float intensity) {
     output_intensity_ = intensity;
 }
 
+
+
+float M3508_Motor::FeedforwardIntensityCalc(float current_angle)
+{
+    const float g = 9.8f;              // 重力加速度
+
+    // 计算重力产生的力矩
+    float angle_rad = current_angle * 3.1415926535f / 180.0f;
+    float gravity_torque = load_mass_ * g * arm_length_ * sinf(angle_rad);
+
+    // 计算电机轴需要的力矩 (考虑减速比)
+    float motor_torque = gravity_torque / ratio_;
+
+    // 计算需要的电流
+    float intensity = motor_torque / torque_constant_;
+
+    return intensity;
+}

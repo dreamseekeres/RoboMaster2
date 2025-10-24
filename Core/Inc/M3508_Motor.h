@@ -28,6 +28,11 @@ private:
         POSITION_SPEED,
     } control_method_;
 
+    //负重计算
+    const float load_mass_ = 0.5f;           // 500g负重
+    const float arm_length_ = 0.05524f;      // 55.24mm力臂
+    const float torque_constant_ = 0.286f;    // 扭矩常数
+
 
 public:
     float linearMapping(int in, int in_min, int in_max, float out_min, float out_max);
@@ -42,6 +47,13 @@ public:
     void SetIntensity(float intensity);
 
     void handle();  // 控制处理函数
+    float FeedforwardIntensityCalc(float current_angle);
+
+    // 获取状态信息
+    float getAngle() const { return angle_; }
+    float getSpeed() const { return rotate_speed_ / ratio_; }  // 返回机械转速
+    float getCurrent() const { return current_; }
+    float getOutputIntensity() const { return output_intensity_; }
 
 };
 

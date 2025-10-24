@@ -55,7 +55,8 @@ uint32_t key_pressed = 0;
 uint32_t last_key_time = 0;
 uint8_t rx_msg[4] ;
 uint8_t tx_msg[4] ;
-
+uint8_t stop_flag = 1;
+float target_angle = 0.0f;  // 新增全局目标角度变量
 
 
 CAN_RxHeaderTypeDef rx_header;
