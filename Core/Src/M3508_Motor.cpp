@@ -8,8 +8,8 @@ M3508_Motor::M3508_Motor(const float ratio,
                          float sp_kp, float sp_ki, float sp_kd, float sp_i_max, float sp_out_max,
                          float pp_kp, float pp_ki, float pp_kd, float pp_i_max, float pp_out_max)
     : ratio_(ratio),
-      spid_(sp_kp, sp_ki, sp_kd, sp_i_max, sp_out_max),
-      ppid_(pp_kp, pp_ki, pp_kd, pp_i_max, pp_out_max),
+      spid_(sp_kp, sp_ki, sp_kd, sp_i_max, sp_out_max,0.1),
+      ppid_(pp_kp, pp_ki, pp_kd, pp_i_max, pp_out_max,0.2),
       control_method_(TORQUE)
 {
     // 初始化变量
@@ -87,6 +87,8 @@ void M3508_Motor::canRxMsgCallback(const uint8_t rx_data[8]){
     //计算累计
     delta_angle_ = delta_ecd_angle_ / ratio_;
     angle_ += delta_angle_;
+    fdb_angle_ = angle_;
+    fdb_speed_ = rotate_speed_ / ratio_;
 }
 
 
@@ -113,7 +115,7 @@ void M3508_Motor::SetIntensity(float intensity) {
 
 float M3508_Motor::FeedforwardIntensityCalc(float current_angle)
 {
-    const float g = 9.8f;              // 重力加速度
+    const float g = 9.794f;              // 重力加速度
 
     // 计算重力产生的力矩
     float angle_rad = current_angle * 3.1415926535f / 180.0f;

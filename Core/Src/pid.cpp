@@ -31,7 +31,7 @@ float PID::calc(float ref, float fdb) {
     pout_ = kp_ * err_;
 
     // 积分项
-    float i_increment = ki_ * err_;
+    float i_increment = ki_ * err_ * 0.001;
     err_sum_ += i_increment;
 
     // 积分限幅
@@ -43,8 +43,8 @@ float PID::calc(float ref, float fdb) {
     iout_ = err_sum_;
 
     // 微分项（带滤波）
-    float d_raw = kd_ * (err_ - last_err_);
-    dout_ = (1 - d_filter_k_) * last_dout_ + d_filter_k_ * d_raw;
+    float d_raw = kd_ * (err_ - last_err_) / 0.001 ;
+    dout_ = d_filter_k_ * last_dout_ + (1 - d_filter_k_) * d_raw;
 
     // 计算总输出
     output_ = pout_ + iout_ + dout_;

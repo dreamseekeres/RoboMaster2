@@ -57,7 +57,11 @@ uint8_t rx_msg[4] ;
 uint8_t tx_msg[4] ;
 uint8_t stop_flag = 1;
 float target_angle = 0.0f;  // 新增全局目标角度变量
-
+// --- 按键检测相关变量 ---
+uint8_t last_button_state = GPIO_PIN_SET; // 记录上一次按键状态，假设未按下时为高电平
+uint32_t last_debounce_time = 0;          // 记录上次消抖处理的时间
+uint32_t debounce_delay = 200;            // 消抖延时，单位毫秒
+// --- 按键检测相关变量 ---
 
 CAN_RxHeaderTypeDef rx_header;
 CAN_TxHeaderTypeDef tx_header = {
@@ -79,7 +83,7 @@ CAN_FilterTypeDef filter_config = {
   .FilterActivation = ENABLE
 };
 uint8_t rx_data[8];
-uint8_t tx_data[8] = {0x00,0xc0,0x00,0x00,0x00,0x00,0x00,0x00};
+uint8_t tx_data[8] = {0x00,0xd0,0x00,0x00,0x00,0x00,0x00,0x00};
 uint32_t can_tx_mail_box_;
 /* USER CODE END PV */
 
@@ -137,7 +141,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    // --- 按键检测逻辑 ---
+    uint8_t current_button_state = HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin); // 读取当前按键状态
 
+    // 检测按键状态从高电平（未按下）变为低电平（按下） - 下降沿检测
+    if (last_button_state == GPIO_PIN_SET && current_button_state == GPIO_PIN_RESET) {
+      uint32_t current_time = HAL_GetTick(); // 获取当前系统时间
+
+      // 检查是否超过了消抖延时时间
+      if (current_time - last_debounce_time >= debounce_delay) {
+        stop_flag = !stop_flag; // 切换stop_flag状态
+        last_debounce_time = current_time; // 更新消抖时间
+      }
+    }
+    last_button_state = current_button_state;
     // HAL_UART_Transmit(&huart7, tx_msg, 4, 1000);
     // HAL_Delay(1000);
     // uint32_t arr_value = __HAL_TIM_GetCounter(&htim1)+1;
